@@ -180,10 +180,10 @@ int classifyBayes(std::string text, Mat_<double> priors, Mat_<double> likelihood
 		}
 	}
 	
-	Mat_<double> priorForClass(priors.rows, 1);
+	Mat_<double> posteriorProb(priors.rows, 1);
 	for (int c = 0; c < priors.rows; c++)
 	{
-		priorForClass(c, 0) = 0;
+		posteriorProb(c, 0) = 0;
 		double sumOfLikelihoods = 0;
 		for (int feat = 0; feat < text_X.cols; feat++)
 		{
@@ -196,7 +196,7 @@ int classifyBayes(std::string text, Mat_<double> priors, Mat_<double> likelihood
 				sumOfLikelihoods += log(1 - likelihood(c, feat));
 			}
 		}
-		priorForClass(c, 0) = log(priors(c, 0)) + sumOfLikelihoods;
+		posteriorProb(c, 0) = log(priors(c, 0)) + sumOfLikelihoods;
 	}
 
 	int maxClass = 0;
@@ -204,9 +204,9 @@ int classifyBayes(std::string text, Mat_<double> priors, Mat_<double> likelihood
 
 	for (int i = 0; i < priors.rows; i++)
 	{
-		if (priorForClass(i, 0) > maxVal)
+		if (posteriorProb(i, 0) > maxVal)
 		{
-			maxVal = priorForClass(i, 0);
+			maxVal = posteriorProb(i, 0);
 			maxClass = i;
 		}
 	}
@@ -309,7 +309,7 @@ void project() {
 
 	std::cout << "Most popular english pairs: ";
 
-	int popularity = 0;
+	double popularity = 0.0;
 	for (int i = 0; i < likelihood.cols; i++)
 	{
 		if (likelihood(0, i) > popularity)
@@ -327,12 +327,12 @@ void project() {
 	}
 
 	std::cout << "\nMost popular dutch pairs: ";
-	popularity = 0;
+	popularity = 0.0;
 	for (int i = 0; i < likelihood.cols; i++)
 	{
 		if (likelihood(1, i) > popularity)
 		{
-			popularity = likelihood(0, i);
+			popularity = likelihood(1, i);
 		}
 	}
 
